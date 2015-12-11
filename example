@@ -164,8 +164,160 @@ Parent Scope (scope: false)—This is the default case. If your directive doesn'
 Child Scope (scope:true)—This creates a new child scope for a directive which prototypically inherits from the parent scope. If the properties and functions you set on the scope are not relevant to other directives and the parent, you should probably create a new child scope. With this you also have all the scope properties and functions defined by the parent.
 Isolated Scope (scope:{})— This is like a sandbox! You need this if the directive you're going to build is self-contained and reusable. Your directive might be creating many scope properties and functions which are meant for internal use, and should never be seen by the outside world. If this is the case, it’s better to have an isolated scope. The isolated scope, as expected, does not inherit the parent scope.
 
+Scope Inheritance
+Normal prototypal scope inheritance -- ng-include, ng-switch, ng-controller, directive with scope: true
+Normal prototypal scope inheritance with a copy/assignment -- ng-repeat. Each iteration of ng-repeat creates a new child scope, and that new child scope always gets a new property.
+Isolate scope inheritance-- directive with scope: {...}. This one is not prototypal, but '=', '@', and '&' provide a mechanism to access parent scope properties, via attributes.
+Transcluded scope inheritance -- directive with transclude: true. This one is also normal prototypal scope inheritance, but it is also a sibling of any isolate scope. 
+http://jsfiddle.net/KuldeepGupta/onn9qm7u/
+
+Scope LifeCycle
+
+Creation
+During application bootstrapping, the root scope is created by the $injector.
+New Child scopes are created by some directives during template linking.
+Watcher registration
+Watches are registered during template linking on the scope.
+These watches are used to send model values to the DOM.
+
+Model mutation
+Mutations work properly only when applied within the scope.$apply(), which is by default.
+
+Mutation observation
+Angular runs $digest cycle on the root scope, after $apply.
+During the $digest cycle, model mutations are verified for all $wated expressions.
+If a mutation is found, the $watch listener is called.
+
+Scope destruction
+All child scopes which are not needed any longer, are destroyed via scope.$destroy() API
+On destroying scope, the propagation of $digest calls to the child scope can be avoided.
+This ensures that memory used by these childe scopes can be garbage collected.
 
 
+SrootScope Service
+$rootScope is the top level scope of an Angular app.
+It is a provided service that can be injected into controllers to access root scope
+Only 1 $rootScope exists in an App.
+topmost common ancestor of all scopes
+putting data here is a discouraged way of sharing data across controllers; better to use a service
+$rootScope is created automatically by angular.
+Any component can request for $rootScope via dependency injection
+
+
+
+
+
+$rootScope can be used for making application level broadcasts.
+Certain events are fired by angular API on the $rootScope
+E.g. $locationChangeSuccess fired by $location
+
+http://jsfiddle.net/KuldeepGupta/7yp520g4/
+http://jsfiddle.net/KuldeepGupta/69uaksm1/
+
+Scope Patterns - Observer
+There are two basic ways of communication between the scopes
+calling methods of parent scope by a child scope allows communication in a single direction - child to parent. 
+Calling method of given child scope or notify it about a triggered event in the context of the parent scope. 
+AngularJS provides built-in observer pattern.
+Another possible use case, of the observer pattern, is when multiple scopes are interested in given event but the scope, in which context the event is triggered, is not aware of them. This allows decoupling between the different scopes, non of the scopes should be aware of the rest of the scopes.
+
+Each AngularJS scope has public methods called $on, $emit and $broadcast. 
+The method $on accepts topic as first argument and callback as second. 
+We can think of the callback as an observer - an object, which implements the Observer interface. 
+
+The methods $emit and $broadcast are used for triggering events respectively upwards and downwards through the scope chain. For example:
+The scope in the example above, triggers the event event--‐name to all scopes upwards. 
+Each of the parent scopes of the given one, which are subscribed to the event event--‐name, would be notified and their handler callback will be invoked.
+Analogical is the case when the method $broadcast is called. 
+In case of $broadcast, the only difference is that the event would be transmitted downwards - to all children scopes. 
+Each scope can subscribe to any event with multiple callbacks (i.e. it can associate multiple observers to given event).
+In the JavaScript community this pattern is better known as publish/subscribe.
+
+Scope Patterns – Chain of Responsibility
+In an AngularJS application form a hierarchy is there known as the scope chain. 
+Some of the scopes are "isolated", which means that they don't inherit prototypically by their parent scope, but are connected to it via their $parent property.
+When $emit or $broadcast are called, scope chain acts as event bus, or even more accurately chain of responsibilities. 
+Once the event is triggered it is emitted downwards or upwards (depending on the method, which was called). 
+Each subsequent scope may:
+Handle the event and pass it to the next scope in the chain
+Handle the event and stop its propagation
+Pass the event to the next scope in the chain without handling it
+Stop the event propagation without handling it
+
+In the example above, ChildCtrl triggers an event, which is propagated upwards through the scope chain. 
+Each of the parent scopes (the one used in ParentCtrl and the one used in MainCtrl) are going to handle the event by logging into the console: "foo received". 
+If any of the scopes should be considered as final destination it can call the method stopPropagation of the event object, passed to the callback.
+
+Scope Patterns – Command
+ng--‐bind (for single-way data binding) and ng--‐model (for two-way data binding) are used to bind model to the view.
+For example, if we want each change in the model foo to reflect the view we can:
+
+
+Now each time we change the value of foo the inner text of the span will be changed. 
+We can achieve the same effect with more complex AngularJS expressions, like:
+
+
+In above the value of the span will be the concatenated uppercased value of foo and bar. 
+What happens behind the scene?
+Each $scope has method called $watch. When the AngularJS compiler find the directive ng--‐bind,  it creates a new watcher of the expression foo +''+bar|uppercase,i.e. 
+   	scope.$watch ("foo +''+bar|uppercase",function(){/*body*/});. 
+The callback will be triggered each time the value of the expression change. 
+In the current case the callback will update the value of the span.
+
+
+watcher object acts as a command. 
+The expression of the command is being evaluated on each "$digest" loop. 
+Once AngularJS detects change in the expression, it invokes the listener function. 
+The watcher command encapsulates the whole information required for watching given expression and delegates the execution of the command to the listener (the actual receiver). 
+We can think of the $scope as the command's Client and the $digest loop as the command's Invoker.
+
+Forms
+What are Forms?
+A Form is a collection of controls (input, select, textarea) for the purpose of grouping related controls together.
+Form and controls provide client-side validation services in Angular JS.
+
+Adding Style and controls in Forms 
+To allow styling of form as well as controls, ngModel adds these CSS classes:
+ng-valid: the model is valid
+ng-invalid: the model is invalid
+ng-valid-[key]: for each valid key added by $setValidity
+ng-invalid-[key]: for each invalid key added by $setValidity
+ng-pristine: the control hasn't been interacted with yet
+ng-dirty: the control has been interacted with
+ng-touched: the control has been blurred
+ng-untouched: the control hasn't been blurred
+ng-pending: any $asyncValidators are unfulfilled
+
+Implementing a Basic Form
+A form to enter user details and capture this information in an Angular.js scope.
+ngModel directive provides the two-way data-binding by synchronizing the model to the view, as well as view to the model. 
+novalidate attribute disables the HTML5 validations, which are client-side validations supports
+      by modern browsers.
+http://jsfiddle.net/KuldeepGupta/585cogLu
+Binding to Form and control State
+
+http://jsfiddle.net/KuldeepGupta/asfwvkmm/
+
+Displaying Form Validation Errors
+
+http://jsfiddle.net/KuldeepGupta/m2410r2y/
+Validating a Form Model Client-Side
+http://jsfiddle.net/KuldeepGupta/haf34Lkg
+Implementing Custom Validations
+
+http://jsfiddle.net/KuldeepGupta/fydm46vw
+
+
+
+Filter is used to 
+Format
+Sort 
+Filter data
+Filter can be applied in 
+Expression 
+Directives
+Javascript
+http://jsfiddle.net/KuldeepGupta/qvL4y4o3/
 
 
 
