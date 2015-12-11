@@ -1,0 +1,25 @@
+
+Data Binding - Automatic synchronization of data between the model and view components.
+The model is the single-source-of-truth for the application state.
+The view is a instant projection of the model at all times. When the model changes, the view reflects the change, and vice versa.
+This avoids active manipulation of the DOM and supports bootstrapping and rapid development of web applications.
+$scope service in Angular, detects changes to the model and modifies HTML in the view accordingly.
+Any modification in the view are updated in the model via controller in the same way.
+
+Controllers add data and methods to $scope as properties
+HTML elements select a controller
+with ng-controller attribute
+in effect for the element and its descendants
+Form elements bind to $scope properties
+with ng-model attribute
+Binding expressions access data and methods
+on $scope of their controller
+expressions in double-curly braces {{ }} that appear in HTML attribute values and element content
+When JavaScript code changes value of a $scope property ...
+form elements that refer to them with ng-model are updated
+binding expressions that refer to them are updated
+When user changes value of an form element ...
+$scope property referred to by the ng-model attribute is updated
+
+
+
