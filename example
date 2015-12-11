@@ -128,6 +128,42 @@ Scopes can be nested. Nested scopes are either "child scopes" or "isolate scopes
 A "child scope" (prototypically) inherits properties from its parent scope. An "isolate scope" does not.
 Scopes provide context against which expressions are evaluated. 
 
+Scope as a Data-Model
+Scope is the glue between application controller and the view.
+ It is an execution context for expressions.
+$watch expressions on the scope allows the directives to be notified of property changes, which allows the directive to render the updated value to the DOM.
+Both controllers and directives have reference to the scope, but not to each other which isolates the controller from the directive as well as from the DOM which make the controllers view agnostic.
+Expressions are always evaluated in the local scope.
+$rootScope is one instance per an Angular app and shared globally for all the controllers of the application
+A model belongs to  one and only one scope
+Any property on $scope object can be used in the view expressions.
+Following directives automatically create scope :
+ng-app(Root Scope)
+ng-controller 
+ng-repeat
+http://jsfiddle.net/KuldeepGupta/7bpczjt2/
+
+Scope Hierarchies
+Scopes are usually connected via a hierarchy & the child scope has access to parent scope properties.
+lookup starts at scope of controller and proceeds upward through scope hierarchy
+Each Angular application has exactly one root scope, but may have several child scopes.
+Creation of multiple scopes is also supported by Angular as some directives create new child scopes.
+A child scope normally prototypically inherits from its parent scope.
+New scopes automatically become children of their parent scope. This will create a tree structure. Which will be parallel to the DOM.
+On encountering {{ emailed }}, the scope associated with the given element is checked.
+If such a property is not found, Angular searches with the parent scope and move on until the root scope is reached.
+Having a '.' in your models will ensure that prototypal inheritance is in play.
+$parent.parentScopeProperty in the child scope prevent the child scope from creating its own property.
+The following create new child scopes, and inherit prototypically: ng-repeat, ng-include, ng-switch, ng-view, ng-controller, directive with scope:true , directive with transclude:true.
+The following creates a new scope which does not inherit prototypically: directive with scope: { … }. This creates an “isolate” scope.
+By default, directives do not create new scope -- i.e., the default is scope:false.
+For all scopes (prototypal or not), Angular always tracks a parent-child relationship (i.e., a hierarchy), via scope properties $parent, $$childHead and $$childTail.
+
+Scope Types
+Parent Scope (scope: false)—This is the default case. If your directive doesn't manipulate the parent scope properties you might not need a new scope. In this case, using the parent scope is okay.
+Child Scope (scope:true)—This creates a new child scope for a directive which prototypically inherits from the parent scope. If the properties and functions you set on the scope are not relevant to other directives and the parent, you should probably create a new child scope. With this you also have all the scope properties and functions defined by the parent.
+Isolated Scope (scope:{})— This is like a sandbox! You need this if the directive you're going to build is self-contained and reusable. Your directive might be creating many scope properties and functions which are meant for internal use, and should never be seen by the outside world. If this is the case, it’s better to have an isolated scope. The isolated scope, as expected, does not inherit the parent scope.
+
 
 
 
