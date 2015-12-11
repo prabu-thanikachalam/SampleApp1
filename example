@@ -21,5 +21,117 @@ binding expressions that refer to them are updated
 When user changes value of an form element ...
 $scope property referred to by the ng-model attribute is updated
 
+Use Case and benefits
+As the view is just a projection of the model, the controller is completely separated from the view.
+This makes testing a snap because it is easy to test your controller in isolation without the view and the related DOM/browser dependency.
+
+ng-model Directive
+ng-model directive updated the model when the view changes.
+ng-model directive can be used with 
+Input
+Select
+textarea
+
+Overview
+A JavaScript constructor function that is used to augment the Angular Scope.
+Attached to the DOM via the ng-controller directive.
+Contain only the business logic needed for a single view 
+Controllers Assigns properties to $scope  at the time in DOM which creates and updates the model. 
+Controllers add data and methods to $scope
+for use in model bindings (ng-model attribute),
+binding expressions {{expression}}
+and event handling directives (ex. ng-click)
+Controller methods can be created through direct assignment to scope.
+$controller service takes care of instantiating controllers.
+Can depend on services and invoke their methods
+Controllers are not singletons
+controller functions are invoked each time the associated view is rendered
+local variables in controller functions are lost, so state cannot be maintained in them
+
+Do not use controllers to 
+Manipulate DOM — Use data binding and directives instead
+Format input — Use angular form controls instead.
+Filter output — Use angular filters instead.
+Share code or state across controllers — Use angular services instead.
+Manage the life-cycle of other components (for example, to create service instances
+
+http://jsfiddle.net/KuldeepGupta/emywcjsh/
+
+1. Updating a temple when input text changes
+http://jsfiddle.net/KuldeepGupta/vftytb3p/
+
+2. Data Binding with many text Inputs
+http://jsfiddle.net/KuldeepGupta/np0h39qa/
+
+3. Data binding with  different ng-model object
+http://jsfiddle.net/KuldeepGupta/wo3t21c5/
+
+4. Clearing the entered name on submit using data binding
+http://jsfiddle.net/KuldeepGupta/skthw5o9/
+To create a controller
+app.controller('name', function (services) { ... });
+controller names are typically camel-case with first letter uppercase, ending with “Ctrl”
+services is a list of service names this controller uses as separate parameters, not an array
+services are provided via dependency injection
+
+
+
+
+
+
+To use a controller
+add ng-controller attribute to an HTML element
+	
+
+
+Controllers can be added in AngularJS in three ways
+Declaring controller as a global function
+Declaring controller on entire App
+Declaring controller in a module
+
+Declaring Controller for entire App
+
+Angular code can be written more efficiently by creating modules.
+
+
+
+The module can now be set as the app module.
+		
+
+This approach prevents pollution of global namespace
+The module ‘myModule’ will be loaded when Angular app loads and hence the component associated with the main module will also be loaded.
+Controllers can also be added to the main module.
+
+http://jsfiddle.net/KuldeepGupta/uyo8kcar/
+
+http://jsfiddle.net/KuldeepGupta/jzpw2ebf/
+http://jsfiddle.net/KuldeepGupta/7d0L60m7/
+http://jsfiddle.net/KuldeepGupta/ws2c95gt/
+Scope and Scope Characteristics
+What are Scopes?
+Scope is an object that refers to the application model. 
+It is an execution context for expressions.
+Scopes are arranged in hierarchical structure which mimic the DOM structure of the application.
+Provide access to data and methods within the scope of a controller
+Scopes can watch expressions and propagate events.
+
+$Scope service
+a provided service that can be injected into controllers to access current scope
+to add data, $scope.name = value;
+to add a method, $scope.fnName = function (...) { ... };
+to get parent scope, $scope.parent()
+
+Scopes characteristics
+Scopes provide APIs ($watch) to observe model mutations.
+Scopes provide APIs ($apply) to propagate any model changes through the system into the view from controllers, services, Angular event handlers. Scopes are arranged in hierarchical structure which mimic the DOM structure of the application.
+Scopes can be nested. Nested scopes are either "child scopes" or "isolate scopes". 
+A "child scope" (prototypically) inherits properties from its parent scope. An "isolate scope" does not.
+Scopes provide context against which expressions are evaluated. 
+
+
+
+
+
+
 
 
