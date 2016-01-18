@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+<body>
+	<div ng-app="filterApp" ng-controller="filterController"
+		class="container">
+		<h3>Custom Filter</h3>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Item</th>
+					<th>Price (INR)</th>
+					<th>Price (USD)</th>
+					<th>Quantity</th>
+					<th>Item Type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="inventory in inventories | orderBy:'orderedDate'">
+					<td>{{inventory.Item | capCase}}</td>
+					<td>{{inventory.price | currency : 'INR '}}</td>
+					<td>{{inventory.price | USCurrencyFilter}}</td>
+					<td>{{inventory.quantity}}</td>
+					<td>{{inventory.itemCode | ConsumFilter : inventory.itemCode}}</td>
+					<!-- Customer filter ‘consumFilter’ is used-->
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<script>
+	<!-- Customer filter ‘consumFilter’ is defined-->
+		var app = angular.module('filterApp', []).filter("ConsumFilter",
+				function() {
+					return function(consumableType, itmCode) {
+						switch (consumableType) {
+						case 1:
+							return "Consumables";
+							break;
+						case 2:
+							return "Non-Consumables";
+							break;
+						default:
+							return "NA";
+						}
+					}
+		}).filter("USCurrencyFilter", function($filter) {
+			return function(itmPrice) {
+				return $filter("currency")(itmPrice * 66, '$ ', 2);
+			}
+		}).filter(
+				'capCase',
+				function() {
+					return function(input) {
+						var words = input.split(' ');
+						for (var i = 0, len = words.length; i < len; i++)
+							words[i] = words[i].charAt(0).toUpperCase()
+									+ words[i].slice(1);
+						return words.join(' ');
+					};
+				});
+
+		app.controller('filterController', function($scope) {
+			$scope.inventories = [ {
+				Item : 'laptop',
+				price : '30000',
+				quantity : '150',
+				itemCode : 2
+			}, {
+				Item : 'keyboard',
+				price : '300',
+				quantity : '400',
+				itemCode : 2
+			}, {
+				Item : 'mouse',
+				price : '350',
+				quantity : '110',
+				itemCode : 2
+			}, {
+				Item : 'samsung monitor',
+				price : '1800',
+				quantity : '250',
+				itemCode : 2
+			}, {
+				Item : 'milk',
+				price : '12',
+				quantity : '20',
+				itemCode : 1
+			} ];
+		});
+	</script>
+</body>
+</html>
+
