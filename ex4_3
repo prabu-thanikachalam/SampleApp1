@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+<body>
+	<div ng-app="filterApp" ng-controller="filterController"
+		class="container">
+		<h3>Customizing Filter</h3>
+		<label>Search
+			in record with Price > 300:<input ng-model="searchInput">
+		</label><br>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Item</th>
+					<th>Price</th>
+					<th>Quantity</th>
+					<th>OrderedDate</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+					ng-repeat="inventory in inventories | orderBy:'orderedDate' | filter : myCustomFilter | searchByFilter:searchInput">
+					<td>{{inventory.Item}}</td>
+					<td>{{inventory.price}}</td>
+					<td>{{inventory.quantity}}</td>
+					<td>{{inventory.orderedDate}}</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+	<script>
+		var app = angular.module('filterApp', []).filter(
+				"searchByFilter",
+				function($filter) {
+					return function(inputArray, searchCriteria) {
+						if (!angular.isDefined(searchCriteria)
+								|| searchCriteria == '') {
+							return inputArray;
+						}
+						var data = [];
+						angular.forEach(inputArray, function(itemVal) {
+							if (itemVal.price > 300) {
+								if (itemVal.Item.toLowerCase().indexOf(searchCriteria.toLowerCase()) != -1) {
+									data.push(itemVal);
+								}
+							}
+						});
+						return data;
+					};
+				});
+
+		app.controller('filterController', function($scope) {
+			$scope.inventories = [ {
+				Item : 'Laptop',
+				price : 30000,
+				quantity : '150',
+				orderedDate : '2015-01-01'
+			}, {
+				Item : 'Keyboard',
+				price : 300,
+				quantity : '400',
+				orderedDate : '2015-04-21'
+			}, {
+				Item : 'Mouse',
+				price : 350,
+				quantity : '110',
+				orderedDate : '2015-02-23'
+			}, {
+				Item : 'Monitor',
+				price : 1800,
+				quantity : '250',
+				orderedDate : '2015-07-13'
+			}, {
+				Item : 'Lan Cables',
+				price : 100,
+				quantity : '2500',
+				orderedDate : '2015-09-10'
+			} ];
+
+			$scope.myCustomFilter = function(value, index, array) {
+				return value.Item == 'Monitor' ? false : true;
+			}
+		});
+	</script>
+</body>
+</html>
