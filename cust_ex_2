@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<body>
+	<div ng-app="filterApp" ng-controller="filterController" class="container">
+		<br>
+		<br>
+		<h3>Basic Filter in Javascript</h3>
+		<table class="table">
+			<tr>
+				<td><b>Name</b></td>
+				<td>{{empname}}</td>
+			</tr>
+			<tr>
+				<td><b>Place</b></td>
+				<td>{{place}}</td>
+			</tr>
+			<tr>
+				<td><b>Date of Birth</b></td>
+				<td>{{empdob}}</td>
+			</tr>
+			<tr>
+				<td><b>Salary</b></td>
+				<td>{{empsalary}}</td>
+			</tr>
+			<tr>
+				<td><b>Car</b></td>
+				<td>{{jsoncar}}</td>
+			</tr>
+		</table>
+	</div>
+	
+	<script>
+	
+	var myCar = new Object();
+	myCar.make = "Ford";
+	myCar.model = "Mustang";
+	myCar.year = 1969;
+	
+	var app = angular.module('filterApp', []);
+	app.controller('filterController', function($scope, $filter) {
+		$scope.empname = $filter('uppercase')('John');<!-- uppercase filter-->
+		$scope.place = $filter('lowercase')('BANGALORE');<!-- lowercase filter-->
+		$scope.empdob = $filter('date')('1900-01-01', 'dd-MMM-yyyy');<!-- date filter-->
+		$scope.empsalary = $filter('currency')('15432', '$', 2);<!-- currency filter-->
+		$scope.jsoncar = $filter('json')(myCar);
+	});
+</script>
+</body>
+</html>
