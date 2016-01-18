@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+</head>
+<body>
+	<div ng-app="filterApp" ng-controller="filterController"
+		class="container">
+		<h3>OrderBy Filter</h3>
+		<br> <br>
+		<!-- orderBy filter -->
+		<label>Order By: <select ng-model="sortByColNm">
+				<option value="Item">Item</option>
+				<option value="price">Price</option>
+				<option value="quantity">Quantity</option>
+				<option value="orderedDate">Order Date</option>
+				<option value="-Item">Item Desc</option>
+				<option value="-price">Price Desc</option>
+				<option value="-quantity">Quantity Desc</option>
+				<option value="-orderedDate">Order Date Desc</option>
+		</select></label> 
+		<label>reverse <input type="checkbox" ng-model="descSort"></label><br>
+		<label>No:of:Rows to display: <select ng-model="rowsToDisplay">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="-1">-1</option>
+				<option value="-2">-2</option>
+				<option value="-3">-3</option>
+		</select></label>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Price</th>
+						<th>Quantity</th>
+						<th>OrderedDate</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr
+						ng-repeat="inventory in inventories | orderBy:[sortByColNm, 'Item'] : descSort | limitTo : rowsToDisplay">
+						<td>{{inventory.Item}}</td>
+						<td>{{inventory.price}}</td>
+						<td>{{inventory.quantity}}</td>
+						<td>{{inventory.orderedDate}}</td>
+					</tr>
+				</tbody>
+			</table> <br> <br> 
+			
+			
+	</div>
+	<script>
+		var app = angular.module('filterApp', []);
+		app.controller('filterController', function($scope) {
+			$scope.inventories = [ {
+				Item : 'Laptop',
+				price : '30000',
+				quantity : '150',
+				orderedDate : '2015-01-01'
+			}, {
+				Item : 'Keyboard',
+				price : '300',
+				quantity : '400',
+				orderedDate : '2015-04-21'
+			}, {
+				Item : 'Mouse',
+				price : '350',
+				quantity : '110',
+				orderedDate : '2015-02-23'
+			}, {
+				Item : 'Samsung Monitor',
+				price : '1800',
+				quantity : '250',
+				orderedDate : '2015-07-13'
+			}, {
+				Item : 'Cables',
+				price : '100',
+				quantity : '2500',
+				orderedDate : '2015-09-10'
+			} ];
+		});
+	</script>
+</body>
+</html>
