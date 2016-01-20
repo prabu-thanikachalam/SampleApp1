@@ -1,0 +1,105 @@
+Filter is used to 
+Format
+Sort 
+Filter data
+
+Filter can be applied in 
+Expression 
+Directives
+Javascript
+
+Syntax
+In HTML Template Binding
+{{ filter_expression | filter_name : arguments}}
+In JavaScript
+$filter(‘filter_name')(input, arguments)
+Custom Filter
+angular.module(‘module_name', []).filter(‘app_name',  
+         function() {
+                 return function(input) {
+                  …
+                 };
+         });
+Angular provide wide variety of date formatting please check this URL for reference, https://docs.angularjs.org/api/ng/filter/date
+Notable feature – Predefined Localized format, where the format are defined as a logical text.
+
+
+
+Medium – is default formatting rule if no formatting specified
+Timezone – Argument to the date filter is used to display the date in different timezone format. It understands UTC/GMT and the continental US time zone abbreviations, but for general use, use a time zone offset, for example, '+0430‘. If not specified, the timezone of the browser will be used.
+Date filter formats the date based on the timezone of the browser.
+
+To tell AngularJS what locale (language and country) to use when writing localized output, you need to include the corresponding AngularJS locale file. Here is an example that includes the Danish locale:
+
+All locale are available at code.angularjs.org and https://github.com/angular/angular.js/tree/master/src/ngLocale
+Angular supports Internationalization for date, number and currency filters.
+If no locale explicitly applied following default will be taken,
+Date – Local Time zone.
+Number, Currency – US locale.
+OrderBy – This filter is used to sort the array. Syntax: {{ orderBy_expression | orderBy : expression : reverse}}
+Consider we have an Order table and we want to sort it based on the user input, let’s see how to achieve this,
+Step 1: Create a module, controller and Scope property to hold the data to be displayed.
+Step 2: Display the Order details using ng-repeat directive.
+
+
+
+Step 3: Now in order to sort based on say Item name add the filter OrderBy with Scope property name as expression.
+
+Step 4: To sort based on user input add the select box in the view holding the column name based on which table to be sorted.
+
+
+Step 5: Option value should be the name of the scope property.
+Step 6: Now pass the select box binding name as the filter argument to OrderBy.
+By default OrderBy filter will do ascending sort. Now how to achieve descending sort ?
+It can be achieved either by appending “-” minus sign to the property name or by passing the 2nd argument (reverse) of OrderBy Filter as true
+In order to sort based on multiple column provide the column name ‘,’ separated inside the bracket in the expression
+Consider we want to limit the number of rows displayed in the screen and in order to achieve this LimitTo filter is used as below,
+LimitTo - Creates a new array or string containing only a specified number of elements. The elements are taken from either the beginning or the end of the source array, string or number, as specified by the value and sign (positive or negative) of limit. If a number is used as input, it is converted to a string.
+Syntax : {{ limitTo_expression | limitTo : limit : begin}}
+Step 1: Add one more pipe symbol to chain the filter result and add LimitTo filter with the argument to specify number of rows to be displayed.
+
+Step 2: Suppose if you want to limit the rows from the last it can be achieved by prefixing “-” sign to the 1st argument (limit) of LimitTo filter.
+Step 3: If the limitation needs to happen from the specific position or index please pass the 2nd argument (begin) mentioned the index from where the limitation needs to be applied. As a negative index, begin indicates an offset from the end of input.
+Selects a subset of items from array and returns it as a new array.
+Syntax : {{ filter_expression | filter : expression : comparator}}
+Consider we have an Order table and we want to filter the content based on the user input, let’s see how to achieve this,
+Step 1: Create a module, controller and Scope property to hold the data to be displayed.
+Step 2: Now in order to filter based on a text starting with “M” add the filter “filter”, a colon “:” and a text based on which filter needs to happen. Comparator false will look for a substring match in case insensitive way and true will do the exact match.
+
+Step 3: To filter the content on user input add a input text boxes and use ng-model directive to bind it with scope property of the model which needs to be filtered.
+
+
+Step 4: Add the above input text box scope property name as a expression to filter.
+
+Step 5: To filter the content based on multiple input and also wants to exclude certain item from the list.
+
+A special property name $ can be used (as in {$:"text"}) to accept a match against any property of the object.
+
+
+
+
+In the below example we are going to write a filter to capitalize only the first letter of the word
+Step 1: Create a filter “Capitalize” and register it with angular module
+Step 2: Use the filter in the html code
+
+In the below example we are going to write a filter for displaying description based on item code
+Step 1: Create a filter “CodeDescFilter” and register it with angular module
+Step 2: Pass the argument required by the filter to decide the description to be displayed.
+
+In the below example we are going to write a filter for Currency conversion
+Step 1: Create a custom filter “USCurrencyFilter”
+Step 2: Inject $filter service
+Step 3: Pass the argument required (To currency and the object holding the currency, rates and symbol) by the filter for conversion 
+
+In the below example we are going to write a filter for displaying date in different time offset 
+Step 1: Create a custom filter “customDateFilter”
+Step 2: Inject $filter service
+Step 3: Pass the argument (timezone) required by the filter for conversion 
+
+In the below example we are going to write a filter for filtering the content in the table excluding the data provided dynamically in the screen.
+Step 1: Define 2 scope property excludeCriteria to hold the exclusion type and excludeCriteriaVal to hold the exclusion value.
+Step 2: Create a function “myCustomFilter” in the scope inside the controller.
+For each iteration Fitler filter will pass 3 arguments “value – current iteration object, index – iteration index, array – complete input array” 
+Step 3: Use this function as a argument to Filter 
+If scope.myCustomFilter function returns true then that iterating object will be included in the filter result.
+
