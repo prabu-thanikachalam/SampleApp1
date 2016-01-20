@@ -1,0 +1,163 @@
+Custom directives are used in AngularJS to extend the functionality of HTML and create a new user-defined HTML tag, attributes, css and comments.
+Each directive must be registered with a module.
+A directive definition is an object whose fields tell the compiler what the directive does.
+To register a directive, you use the module.directive API.
+module.directive takes the normalized directive name followed by a factory function.
+This factory function returns an object with the different options to tell $compile how the directive should behave when matched.
+The factory function is invoked only once when the compiler matches the directive for the first time. 
+ Factory function initializes the directive and add the behavior to the directive
+
+Field 			Description
+name 	    The name of the directive.
+Restrict	    In what kind of mark-up this directive can appear.
+priority 	    Hint to the compiler of the order that directives should be executed.
+terminal 	    Whether the compiler should continue compiling directives below this.
+link 	    The link function that will link the directive to the scope.
+template 	    A string that will be used to generate mark-up for this directive.
+templateUrl 	    A URL where the template for this directive may be found.
+replace 	    Whether to replace this directive's element with what is in the template.
+transclude 	    Whether to provide the contents of this directive's element for use in the template and compile  	  	    function.
+scope 	    Whether to create a new child scope or isolated scope for this directive.
+controller 	    A function that will act as a directive controller for this directive.
+require 	    Requires a directive controller from another directive to be injected into this directive's link function.
+compile 	    The compile function that can manipulate the source DOM and will create the link  function and is only 
+	    used if a link has not been provided above.
+
+		
+In this CoffeeShop example line 1 to 10 can be made reusable in multiple pages, how to achieve it ?
+Step 1: Create coffeemenu.html copying line 1 to line 10 from above example
+Step 2: Create a customer directive with templateUrl custom directive definition property pointing to coffeemenu.html
+
+Replace Line 1 to 10 with the custom directive “coffee-menu”
+
+As you could see in this example coffeemenu object is not defined inside the directive scope but how the directive render the information without issue ?
+Custom directives will refer and act on the controller’s scope directly. Whatever data modification happens in custom directive will impact the controller’s scope.
+Lets briefly looks at Scopes, Scopes can be configured in custom directive by setting the Scope property in custom directive definition as follows,
+Scope : false or not defining scope property –  parent scope is used directly by directive, which means that whatever you change in your directive that comes from the parent scope will also change in the parent scope.
+Scope : true - Child / Directive’s scope prototypically inherits from its parent scope.
+Scope : {} – New child scope created that does not prototypically inherit but '=', '@', and '&' provide a mechanism to access parent scope properties, via attributes. This is usually your best choice when creating reusable components, since the directive cannot accidentally read or modify the parent scope.
+
+Now we need to enhancement the CoffeeShop app to display food menu as well, how this can be achieved ?
+Step 1: Create foodmenu.html copying line 1 to line 10 from above example
+Step 2: Create a customer directive with templateUrl custom directive definition property pointing to foodmenu.html
+Step 3: Add food-menu directive into the HTML
+
+
+As could you see both foodmenu.html and coffeemenu.html internal structure is same and only the parameter to ng-repeat directive differs, is it possible to re-use this template between both directive ?
+Yes it can with the help of scope as follows,
+
+Step 1: Create menu.html. Note coffeemenu / foodmenu object name is changed as “menutype” which refers to the scope object in (menu) custom directive’s scope
+
+
+Step 2: Create new directive “menu” and scope property defined as “=menutypeAttr”. 
+
+
+“=“ implies 2 way binding should happen between isolated directive’s scope and controller’s scope.
+“menutypeAttr” (normalized) refer the name of the html attribute (menutype-attr) used in the directive.
+
+
+
+
+We have 2 separate table to display food and coffee menu using same directive but the table doesn’t have a heading to say what type of menu it is.
+In menu.html we can’t put the Menu type as static text since the template is shared between both the menu, so how to achieve this?
+We are going to pass the menu type through one more attribute in our menu directive to achieve this.
+Step 1 : Add the new isolated scope property menudesc in menu directive and assign ‘@’ to it. 
+Here ‘@’ implies String or expression provided in the directive’s attribute should be mapped to the isolated scope property menudesc.
+Step 2 : Add new attribute menudesc (should be same as the isolated property name since no attribute name provided after ‘@’ symbol) with the appropriate String
+Step 3 : Add the menudesc scope property to the display in menu.html
+
+
+
+
+Now lets see how to add the provision to enter the customer details like Name, Address and Delivery type like dine-in or take out.
+ Step 1: Create a scope property in Controller to hold Customer and Delivery type information.
+
+
+Step 2: Create the enter form to input the customer and delivery type
+
+
+
+
+Step 3: Create a template and directive to display the customer and delivery details in purchase order
+Step 4: Define the Scope : true to prototypical inherit parent so initial details entered in parent scope will be copied to directive scope and new child scope will be created once the value start changing in directive and Place the new directive delivery in the appropriate place in the main page
+
+
+
+Now you want to display some special message for each menu and it should be optional and shouldn’t be part of directive definition, how can we achieve it ?
+It can be achieved through Transclusion. Transclusion is the inclusion of the directive's DOM element content into the directive's template.
+Step 1: Add the custom message inside the menu directive.
+
+
+
+
+Step 2: Add and set Transclude property to true in menu directive definition.
+
+
+
+
+
+Step 3: Add ng-transclude directive in the menu template in the place where the content in Step 1 needs to be displayed.
+  
+
+
+Let see how to create a Add Cart functionality to CoffeeShop app
+Step 1: Define new Scope property cart to hold the order item and define a function addToCart in controller’s scope which take a menuitem object as a input which eventually pushed to cart property.
+Step 2: Add a button in menu template for selecting the item and specify the controller’s scope function on ng-click event.
+Now how to call the function defined in Controller scope since menu directive has it own isolated scope ?
+This can be achieved with the help of isolated scope feature ‘&’
+Step 3: Define a isolated scope property “addcart : ‘&’” in menu directive 
+Step 4: Add additional attribute to menu directive and pass the controller’s scope function signature
+Step 5: Create new cart.html to display the selected item.
+Step 6: To reuse the menu directive add a function in templateUrl to determine the template url based on the menudesc attribute.
+When Add button is clicked addToCart function in controller’s scope is invoked and the cart property is updated.
+
+
+Angular provides basic implementation for most common HTML5 input types: (text, number, url, email, date, radio, checkbox), as well as some directives for validation (required, pattern, minlength, maxlength, min, max).
+With Custom directives custom validation can be implemented by combining with ng-model directive and it’s controller.
+Consider the scenario where you want to add multiple validation to the user name in the registration form and it can be achieved in AngularJS as follows,
+We are going to implement the below validations,
+User Id should be only Alphabet with minimum 2 characters
+User Id is already used
+Password should contains Alphabet, numeric and special character and minimum of 6 characters
+
+Step 1: Define the JS variables to hold the validating expression for User Id and Password. 
+Step 2: Define a module with scope holding the user ids already taken.
+Step 3: Create a custom directive “usrexistvalidator”
+Step 4: Add your own validation functions to the $validators object on the ngModelController
+
+Step 4: Create a custom directive “useridvalidator” and “pwdvalidator”  like a same as above
+Step 5: Add the directive in the HTML element using ng-model
+Step 6: Display validation message
+Consider the secanrio where change in one directive needs to be communicated to other directive, how can be achieve this ?
+In this example we are going to draw a circle in one directive based on the input entered received from other directive.
+Step 1: Create the isolated scope for both the directive to make these directive completely independent of Controller’s scope.
+Step 2: Define the shape object inside the link function of shapedata directive
+Step 3: Create a function in shapeDisplay controller which receives the necessary data to modify the circle
+Now this controller and function updateShape act as a bridge for other directives to communicate and update the Circle
+How to use this controller and function in other directive ?
+Step 4: Define the directive property require with the directive name (shapeDisplay) whose controller access is required.
+
+
+
+
+Step 5: Directive communication through controller can only be happened between Child and parent directive so move the shapeData inside ShapeDisplay
+
+
+Step 6: Add one more argument “ctrl” to link function which holds the required directive controller.
+Now when to invoke the updateShape function ? 
+Whenever the Shape property change. 
+But how to know when the shape property change ? 
+Add $watch on Scope property and invoke the updateData function in the controller inside it.
+All steps are done but when I run the examples I couldn’t see the information inside shapeData directive, what might be the issue ?
+The  reason is shapeData directive is put inside shapeDisplay directive so in order to display shapeData it needs to be transcluded.
+Step 7: Set transclude to true in shapeDisplay directive and add ng-transclude inside disptemplate template
+Now the both directive will be displayed and changes happening in shapeData directive will be send / communicate to shapeDisplay through shapeDisplay controller function.
+
+
+
+
+
+
+
+
+		
